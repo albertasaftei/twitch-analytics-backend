@@ -69,6 +69,14 @@ const getAccessToken = async () => {
   return finalResponse.access_token;
 };
 
+router.get("/", (req, res) => {
+  res.json({ message: "Hello World" });
+});
+
+router.get("/health", (req, res) => {
+  res.status(200).send("Everything is ok here");
+});
+
 router.get("/getTwitchData", async (req, res) => {
   const access_token = await getAccessToken();
   const games = await fetch("https://api.twitch.tv/helix/games/top", {
