@@ -78,46 +78,51 @@ router.get("/health", (req, res) => {
 });
 
 router.get("/getTwitchData", async (req, res) => {
-  const access_token = await getAccessToken();
-  const games = await fetch("https://api.twitch.tv/helix/games/top", {
-    headers: {
-      "Client-ID": env.CLIENT_ID,
-      Authorization: `Bearer ${access_token}`,
-    },
-  });
+  try {
+    const access_token = await getAccessToken();
+    const games = await fetch("https://api.twitch.tv/helix/games/top", {
+      headers: {
+        "Client-ID": env.CLIENT_ID,
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
 
-  const gamesData = await games.json();
+    const gamesData = await games.json();
 
-  const finalData = await Promise.all(
-    gamesData.data.map(async (game) => {
-      const allData = await fetchAllPages({
-        apiUrl: `https://api.twitch.tv/helix/streams?first=100&game_id=${game.id}`,
-        token: access_token,
-      });
-      return allData;
-    })
-  );
+    const finalData = await Promise.all(
+      gamesData.data.map(async (game) => {
+        const allData = await fetchAllPages({
+          apiUrl: `https://api.twitch.tv/helix/streams?first=100&game_id=${game.id}`,
+          token: access_token,
+        });
+        return allData;
+      })
+    );
 
-  const dataByGame = gamesData.data.map((game, index) => {
-    return {
-      game: game.name,
-      thumbnail: game?.box_art_url
-        .replace("{width}", "300")
-        .replace("{height}", "500"),
-      viewers: finalData[index].reduce(
-        (acc, data) => acc + data.viewer_count,
-        0
-      ),
-    };
-  });
+    const dataByGame = gamesData.data.map((game, index) => {
+      return {
+        game: game.name,
+        thumbnail: game?.box_art_url
+          .replace("{width}", "300")
+          .replace("{height}", "500"),
+        viewers: finalData[index].reduce(
+          (acc, data) => acc + data.viewer_count,
+          0
+        ),
+      };
+    });
 
-  const newRow = await prisma.twitchData.create({
-    data: {
-      data: dataByGame,
-    },
-  });
+    const newRow = await prisma.twitchData.create({
+      data: {
+        data: dataByGame,
+      },
+    });
 
-  return res.json(newRow);
+    return res.json(newRow);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).send("Error fetching data");
+  }
 });
 
 router.post("/newTwitchData", async (req, res) => {
