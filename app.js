@@ -27,8 +27,8 @@ function authentication(req, res, next) {
   const pass = auth[1];
 
   if (
-    user == process.env.CRONJOB_USER &&
-    pass == process.env.CRONJOB_PASSWORD
+    user === process.env.CRONJOB_USER &&
+    pass === process.env.CRONJOB_PASSWORD
   ) {
     // If Authorized user
     next();
