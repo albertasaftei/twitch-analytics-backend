@@ -44,7 +44,7 @@ function authentication(req, res, next) {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(authentication);
+// app.use(authentication());
 app.use(logger("dev"));
 app.use(json());
 app.use(urlencoded({ extended: false }));
