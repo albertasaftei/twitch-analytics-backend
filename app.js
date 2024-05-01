@@ -32,7 +32,7 @@ function authentication(req, res, next) {
     pass === process.env.CRONJOB_PASSWORD
   ) {
     // If Authorized user
-    next();
+    return next();
   } else {
     let err = new Error("You are not authenticated!");
     res.setHeader("WWW-Authenticate", "Basic");
