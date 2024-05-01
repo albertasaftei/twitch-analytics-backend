@@ -10,19 +10,20 @@ import { fileURLToPath } from "url";
 const app = express();
 
 function authentication(req, res, next) {
-  const authheader = req.headers.authorization;
-  console.log(req.headers);
+  const authHeader = req.headers.authorization;
+  console.log("🚀 ~ authentication ~ authHeader:", authHeader);
 
-  if (!authheader) {
+  if (!authHeader) {
     let err = new Error("You are not authenticated!");
     res.setHeader("WWW-Authenticate", "Basic");
     err.status = 401;
     return next(err);
   }
 
-  const auth = new Buffer.from(authheader.split(" ")[1], "base64")
+  const auth = new Buffer.from(authHeader.split(" ")[1], "base64")
     .toString()
     .split(":");
+  console.log("🚀 ~ authentication ~ auth:", auth);
   const user = auth[0];
   const pass = auth[1];
 
